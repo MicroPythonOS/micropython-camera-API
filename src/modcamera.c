@@ -252,7 +252,7 @@ const mp_rom_map_elem_t mp_camera_hal_pixel_format_table[] = {
 const mp_rom_map_elem_t mp_camera_hal_frame_size_table[] = {
     { MP_ROM_QSTR(MP_QSTR_R96X96),    MP_ROM_INT((mp_uint_t)FRAMESIZE_96X96) },
     { MP_ROM_QSTR(MP_QSTR_QQVGA),     MP_ROM_INT((mp_uint_t)FRAMESIZE_QQVGA) },
-    { MP_ROM_QSTR(MP_QSTR_R128x128),  MP_ROM_INT((mp_uint_t)FRAMESIZE_128X128) },
+    { MP_ROM_QSTR(MP_QSTR_R128X128),  MP_ROM_INT((mp_uint_t)FRAMESIZE_128X128) },
     { MP_ROM_QSTR(MP_QSTR_QCIF),      MP_ROM_INT((mp_uint_t)FRAMESIZE_QCIF) },
     { MP_ROM_QSTR(MP_QSTR_HQVGA),     MP_ROM_INT((mp_uint_t)FRAMESIZE_HQVGA) },
     { MP_ROM_QSTR(MP_QSTR_R240X240),  MP_ROM_INT((mp_uint_t)FRAMESIZE_240X240) },
@@ -260,10 +260,17 @@ const mp_rom_map_elem_t mp_camera_hal_frame_size_table[] = {
     { MP_ROM_QSTR(MP_QSTR_R320X320),  MP_ROM_INT((mp_uint_t)FRAMESIZE_320X320) },
     { MP_ROM_QSTR(MP_QSTR_CIF),       MP_ROM_INT((mp_uint_t)FRAMESIZE_CIF) },
     { MP_ROM_QSTR(MP_QSTR_HVGA),      MP_ROM_INT((mp_uint_t)FRAMESIZE_HVGA) },
+    { MP_ROM_QSTR(MP_QSTR_R480X480),  MP_ROM_INT((mp_uint_t)FRAMESIZE_480X480) },
     { MP_ROM_QSTR(MP_QSTR_VGA),       MP_ROM_INT((mp_uint_t)FRAMESIZE_VGA) },
+    { MP_ROM_QSTR(MP_QSTR_R640X640),  MP_ROM_INT((mp_uint_t)FRAMESIZE_640X640) },
+    { MP_ROM_QSTR(MP_QSTR_R720X720),  MP_ROM_INT((mp_uint_t)FRAMESIZE_720X720) },
     { MP_ROM_QSTR(MP_QSTR_SVGA),      MP_ROM_INT((mp_uint_t)FRAMESIZE_SVGA) },
+    { MP_ROM_QSTR(MP_QSTR_R800X800),  MP_ROM_INT((mp_uint_t)FRAMESIZE_800X800) },
+    { MP_ROM_QSTR(MP_QSTR_R960X960),  MP_ROM_INT((mp_uint_t)FRAMESIZE_960X960) },
     { MP_ROM_QSTR(MP_QSTR_XGA),       MP_ROM_INT((mp_uint_t)FRAMESIZE_XGA) },
+    { MP_ROM_QSTR(MP_QSTR_R1024X1024),MP_ROM_INT((mp_uint_t)FRAMESIZE_1024X1024) },
     { MP_ROM_QSTR(MP_QSTR_HD),        MP_ROM_INT((mp_uint_t)FRAMESIZE_HD) },
+    { MP_ROM_QSTR(MP_QSTR_R1280X1280),MP_ROM_INT((mp_uint_t)FRAMESIZE_1280X1280) },
     { MP_ROM_QSTR(MP_QSTR_SXGA),      MP_ROM_INT((mp_uint_t)FRAMESIZE_SXGA) },
     { MP_ROM_QSTR(MP_QSTR_UXGA),      MP_ROM_INT((mp_uint_t)FRAMESIZE_UXGA) },
     { MP_ROM_QSTR(MP_QSTR_FHD),       MP_ROM_INT((mp_uint_t)FRAMESIZE_FHD) },
@@ -434,4 +441,23 @@ int mp_camera_hal_get_pixel_height(mp_camera_obj_t *self) {
     sensor_t *sensor = esp_camera_sensor_get();
     framesize_t framesize = sensor->status.framesize;
     return resolution[framesize].height;
+}
+
+int mp_camera_hal_set_res_raw(mp_camera_obj_t *self, int startX, int startY, int endX, int endY, int offsetX, int offsetY, int totalX, int totalY, int outputX, int outputY, bool scale, bool binning) {
+    check_init(self);
+    sensor_t *sensor = esp_camera_sensor_get();
+    if (!sensor->set_res_raw) {
+        mp_raise_ValueError(MP_ERROR_TEXT("Sensor does not support set_res_raw"));
+    }
+
+    if (self->captured_buffer) {
+        esp_camera_return_all();
+        self->captured_buffer = NULL;
+    }
+
+    int ret = sensor->set_res_raw(sensor, startX, startY, endX, endY, offsetX, offsetY, totalX, totalY, outputX, outputY, scale, binning);
+    if (ret < 0) {
+        mp_raise_ValueError(MP_ERROR_TEXT("Failed to set raw resolution"));
+    }
+    return ret;
 }

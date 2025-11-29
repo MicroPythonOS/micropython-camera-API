@@ -285,6 +285,48 @@ CREATE_GETSET_FUNCTIONS(wpc, mp_obj_new_bool, mp_obj_is_true);
 CREATE_GETSET_FUNCTIONS(raw_gma, mp_obj_new_bool, mp_obj_is_true);
 CREATE_GETSET_FUNCTIONS(lenc, mp_obj_new_bool, mp_obj_is_true);
 
+// set_res_raw function for ROI (Region of Interest) / digital zoom
+static mp_obj_t camera_set_res_raw(size_t n_args, const mp_obj_t *pos_args, mp_map_t *kw_args) {
+    mp_camera_obj_t *self = MP_OBJ_TO_PTR(pos_args[0]);
+    enum { ARG_startX, ARG_startY, ARG_endX, ARG_endY, ARG_offsetX, ARG_offsetY, ARG_totalX, ARG_totalY, ARG_outputX, ARG_outputY, ARG_scale, ARG_binning };
+    static const mp_arg_t allowed_args[] = {
+        { MP_QSTR_startX, MP_ARG_INT | MP_ARG_REQUIRED },
+        { MP_QSTR_startY, MP_ARG_INT | MP_ARG_REQUIRED },
+        { MP_QSTR_endX, MP_ARG_INT | MP_ARG_REQUIRED },
+        { MP_QSTR_endY, MP_ARG_INT | MP_ARG_REQUIRED },
+        { MP_QSTR_offsetX, MP_ARG_INT | MP_ARG_REQUIRED },
+        { MP_QSTR_offsetY, MP_ARG_INT | MP_ARG_REQUIRED },
+        { MP_QSTR_totalX, MP_ARG_INT | MP_ARG_REQUIRED },
+        { MP_QSTR_totalY, MP_ARG_INT | MP_ARG_REQUIRED },
+        { MP_QSTR_outputX, MP_ARG_INT | MP_ARG_REQUIRED },
+        { MP_QSTR_outputY, MP_ARG_INT | MP_ARG_REQUIRED },
+        { MP_QSTR_scale, MP_ARG_BOOL, {.u_bool = false} },
+        { MP_QSTR_binning, MP_ARG_BOOL, {.u_bool = false} },
+    };
+
+    mp_arg_val_t args[MP_ARRAY_SIZE(allowed_args)];
+    mp_arg_parse_all(n_args - 1, pos_args + 1, kw_args, MP_ARRAY_SIZE(allowed_args), allowed_args, args);
+
+    int ret = mp_camera_hal_set_res_raw(
+        self,
+        args[ARG_startX].u_int,
+        args[ARG_startY].u_int,
+        args[ARG_endX].u_int,
+        args[ARG_endY].u_int,
+        args[ARG_offsetX].u_int,
+        args[ARG_offsetY].u_int,
+        args[ARG_totalX].u_int,
+        args[ARG_totalY].u_int,
+        args[ARG_outputX].u_int,
+        args[ARG_outputY].u_int,
+        args[ARG_scale].u_bool,
+        args[ARG_binning].u_bool
+    );
+
+    return mp_obj_new_int(ret);
+}
+static MP_DEFINE_CONST_FUN_OBJ_KW(camera_set_res_raw_obj, 1, camera_set_res_raw);
+
 //API-Tables
 static const mp_rom_map_elem_t camera_camera_locals_table[] = {
     { MP_ROM_QSTR(MP_QSTR_reconfigure), MP_ROM_PTR(&camera_reconfigure_obj) },
@@ -293,6 +335,7 @@ static const mp_rom_map_elem_t camera_camera_locals_table[] = {
     { MP_ROM_QSTR(MP_QSTR_free_buffer), MP_ROM_PTR(&camera_free_buf_obj) },
     { MP_ROM_QSTR(MP_QSTR_init), MP_ROM_PTR(&camera_init_obj) },
     { MP_ROM_QSTR(MP_QSTR_deinit), MP_ROM_PTR(&mp_camera_deinit_obj) },
+    { MP_ROM_QSTR(MP_QSTR_set_res_raw), MP_ROM_PTR(&camera_set_res_raw_obj) },
     { MP_ROM_QSTR(MP_QSTR___del__), MP_ROM_PTR(&mp_camera_deinit_obj) },
     { MP_ROM_QSTR(MP_QSTR___enter__), MP_ROM_PTR(&mp_identity_obj) },
     { MP_ROM_QSTR(MP_QSTR___exit__), MP_ROM_PTR(&mp_camera___exit___obj) },

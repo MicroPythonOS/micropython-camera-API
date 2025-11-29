@@ -211,7 +211,7 @@ extern const mp_rom_map_elem_t mp_camera_hal_pixel_format_table[9];
  * @brief Table mapping frame sizes API to their corresponding values at HAL.
  * @details Needs to be defined in the port-specific implementation.
  */
-extern const mp_rom_map_elem_t mp_camera_hal_frame_size_table[24];
+extern const mp_rom_map_elem_t mp_camera_hal_frame_size_table[31];
 
 /**
  * @brief Table mapping gainceiling API to their corresponding values at HAL.
@@ -277,5 +277,25 @@ DECLARE_CAMERA_HAL_GET(int, pixel_height)
 DECLARE_CAMERA_HAL_GET(int, pixel_width)
 DECLARE_CAMERA_HAL_GET(const char *, sensor_name)
 DECLARE_CAMERA_HAL_GET(bool, supports_jpeg)
+
+/**
+ * @brief Sets the raw resolution parameters including ROI (Region of Interest).
+ *
+ * @param self Pointer to the camera object.
+ * @param startX X start position.
+ * @param startY Y start position.
+ * @param endX X end position.
+ * @param endY Y end position.
+ * @param offsetX X offset.
+ * @param offsetY Y offset.
+ * @param totalX Total X size.
+ * @param totalY Total Y size.
+ * @param outputX Output X size.
+ * @param outputY Output Y size.
+ * @param scale Enable scaling.
+ * @param binning Enable binning.
+ * @return 0 on success, negative value on error.
+ */
+extern int mp_camera_hal_set_res_raw(mp_camera_obj_t *self, int startX, int startY, int endX, int endY, int offsetX, int offsetY, int totalX, int totalY, int outputX, int outputY, bool scale, bool binning);
 
 #endif // MICROPY_INCLUDED_MODCAMERA_H
