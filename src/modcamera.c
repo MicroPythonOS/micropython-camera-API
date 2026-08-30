@@ -113,6 +113,7 @@ void mp_camera_hal_construct(
     int8_t reset_pin,
     int8_t sccb_sda_pin,
     int8_t sccb_scl_pin,
+    int8_t sccb_i2c_port,
     int32_t xclk_freq_hz,
     mp_camera_pixformat_t pixel_format,
     mp_camera_framesize_t frame_size,
@@ -136,6 +137,12 @@ void mp_camera_hal_construct(
         self->camera_config.pin_xclk = external_clock_pin;
         self->camera_config.pin_sscb_sda = sccb_sda_pin;
         self->camera_config.pin_sscb_scl = sccb_scl_pin;
+        // When sccb_sda_pin is -1, the esp32-camera driver reuses the
+        // already-initialized I2C bus with this port number instead of
+        // installing its own driver on the pins (avoids bus fights when
+        // the camera shares I2C with touch/codec, e.g. Waveshare
+        // ESP32-S3-Touch-LCD-3.5).
+        self->camera_config.sccb_i2c_port = sccb_i2c_port;
 
         self->camera_config.frame_size = frame_size;        
         self->camera_config.jpeg_quality = jpeg_quality;    //save value in here, but will be corrected (with map) before passing it to the esp32-driver

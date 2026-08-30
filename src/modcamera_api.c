@@ -40,7 +40,7 @@ const mp_obj_type_t camera_type;
 
 //Constructor
 static mp_obj_t mp_camera_make_new(const mp_obj_type_t *type, size_t n_args, size_t n_kw, const mp_obj_t *all_args) {
-    enum { ARG_data_pins, ARG_pixel_clock_pin, ARG_vsync_pin, ARG_href_pin, ARG_sda_pin, ARG_scl_pin, ARG_xclock_pin, ARG_xclock_frequency, ARG_powerdown_pin, ARG_reset_pin, ARG_pixel_format, ARG_frame_size, ARG_jpeg_quality, ARG_fb_count, ARG_grab_mode, ARG_init, NUM_ARGS };
+    enum { ARG_data_pins, ARG_pixel_clock_pin, ARG_vsync_pin, ARG_href_pin, ARG_sda_pin, ARG_scl_pin, ARG_xclock_pin, ARG_xclock_frequency, ARG_powerdown_pin, ARG_reset_pin, ARG_sccb_i2c_port, ARG_pixel_format, ARG_frame_size, ARG_jpeg_quality, ARG_fb_count, ARG_grab_mode, ARG_init, NUM_ARGS };
     static const mp_arg_t allowed_args[] = {
         #ifdef MICROPY_CAMERA_ALL_REQ_PINS_DEFINED
             { MP_QSTR_data_pins, MP_ARG_OBJ | MP_ARG_KW_ONLY , { .u_obj = MP_ROM_NONE } },
@@ -62,6 +62,7 @@ static mp_obj_t mp_camera_make_new(const mp_obj_type_t *type, size_t n_args, siz
         { MP_QSTR_xclk_freq, MP_ARG_INT | MP_ARG_KW_ONLY, { .u_int = MICROPY_CAMERA_XCLK_FREQ } },
         { MP_QSTR_powerdown_pin, MP_ARG_INT | MP_ARG_KW_ONLY, { .u_int = MICROPY_CAMERA_PIN_PWDN } },
         { MP_QSTR_reset_pin, MP_ARG_INT | MP_ARG_KW_ONLY, { .u_int = MICROPY_CAMERA_PIN_RESET } },
+        { MP_QSTR_sccb_i2c_port, MP_ARG_INT | MP_ARG_KW_ONLY, { .u_int = 0 } },
         { MP_QSTR_pixel_format, MP_ARG_INT | MP_ARG_KW_ONLY, { .u_int = MICROPY_CAMERA_DEFAULT_PIXEL_FORMAT } },
         { MP_QSTR_frame_size, MP_ARG_INT | MP_ARG_KW_ONLY, { .u_int = MICROPY_CAMERA_DEFAULT_FRAME_SIZE } },
         { MP_QSTR_jpeg_quality, MP_ARG_INT | MP_ARG_KW_ONLY, { .u_int = MICROPY_CAMERA_JPEG_QUALITY } },
@@ -117,6 +118,7 @@ static mp_obj_t mp_camera_make_new(const mp_obj_type_t *type, size_t n_args, siz
     }
     int8_t powerdown_pin = args[ARG_powerdown_pin].u_int;
     int8_t reset_pin = args[ARG_reset_pin].u_int;
+    int8_t sccb_i2c_port = args[ARG_sccb_i2c_port].u_int;
     mp_camera_pixformat_t pixel_format = args[ARG_pixel_format].u_int;
     mp_camera_framesize_t frame_size = args[ARG_frame_size].u_int;
     int8_t jpeg_quality = args[ARG_jpeg_quality].u_int;
@@ -130,7 +132,7 @@ static mp_obj_t mp_camera_make_new(const mp_obj_type_t *type, size_t n_args, siz
     self->base.type = &camera_type;
 
     mp_camera_hal_construct(self, data_pins, xclock_pin, pixel_clock_pin, vsync_pin, href_pin, powerdown_pin, reset_pin, 
-        sda_pin, scl_pin, xclock_frequency, pixel_format, frame_size, jpeg_quality, fb_count, grab_mode);
+        sda_pin, scl_pin, sccb_i2c_port, xclock_frequency, pixel_format, frame_size, jpeg_quality, fb_count, grab_mode);
 
     mp_camera_hal_init(self);
     if (mp_camera_hal_capture(self) == mp_const_none){
