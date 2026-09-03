@@ -139,6 +139,7 @@ extern void mp_camera_hal_construct(
     int8_t reset_pin,
     int8_t sccb_sda_pin,
     int8_t sccb_scl_pin,
+    int8_t sccb_i2c_port,
     int32_t xclk_freq_hz,
     mp_camera_pixformat_t pixel_format,
     mp_camera_framesize_t frame_size,
